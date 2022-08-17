@@ -1,5 +1,5 @@
 ---
-title             : "**Optimal Selection of Tolerance *r* for Entropy Indices**"
+title             : "**A New Heuristic Method for the Optimal Selection of Tolerance *r* for Entropy Indices**"
 shorttitle        : "Optimal Tolerance"
 author: 
   - name          : "Dominique Makowski"
@@ -15,12 +15,12 @@ affiliation:
 authornote: |
   Correspondence concerning this article should be addressed to Dominique Makowski, HSS 04-18, 48 Nanyang Avenue, Singapore (dom.makowski@gmail.com).
 abstract: |
-  The tolerance threshold *r* is a key parameter of several entropy algorithms (e.g., *SampEn*). Unfortunately, the gold standard method to estimate its optimal value - the one that maximizes *ApEn* - is computationally costly, prompting users to rely to cargo-cult rules-of-thumb such as 0.2 * SD. In this study, we first investigated the possibility of using related quantities, namely the amount of Nearest Neighbours (*NN*) and the Recurrence Rate (*RR*), to approximate the optimal *r* value. Secondly, we established a new heuristic, based only on the signal's SD and the embedding dimension *m* (optimal *r* = -0.032 + 0.1497 \* *m*), which was superior to other existing heuristics. All the methods of optimal tolerance *r* estimation used in this study are available in the *NeuroKit2* Python software (Makowski et al., 2021).
+  The tolerance threshold *r* is a key parameter of several entropy algorithms (e.g., *SampEn*). Unfortunately, the gold standard method to estimate its optimal value - the one that maximizes *ApEn* - is computationally costly, prompting users to rely to cargo-cult rules-of-thumb such as 0.2 * SD. In this simulation study, we attempted at validating a new heuristic, based on the embedding dimension *m* and the signal's length *n* (optimal *r* = SD \* 0.281(*m*-1) + 0.005(log(*n*)) - 0.02(*m*-1 \* log(*n*))), which was superior to other existing heuristics. All the methods of optimal tolerance *r* estimation used in this study are available in the *NeuroKit2* Python software (Makowski et al., 2021).
   
-keywords          : "chaos, complexity, fractal, physiology, tolerance"
-wordcount         : "1156"
+keywords          : "chaos, complexity, entropy, tolerance, r, physiology"
+wordcount         : "925"
 bibliography      : "bibliography.bib"
-floatsintext      : no
+floatsintext      : yes
 linenumbers       : yes
 draft             : no
 mask              : no
@@ -45,8 +45,8 @@ options(digits = 3)
 knitr::opts_chunk$set(
   collapse = TRUE,
   dpi = 450,
-  fig.width = see::golden_ratio(9),
-  fig.height = 9,
+  fig.width = see::golden_ratio(7),
+  fig.height = 7,
   fig.path = "figures/"
 )
 
@@ -56,7 +56,7 @@ cache <- TRUE
 
 ## Introduction
 
-Complexity analysis is a growing approach to physiological signals, including cardiac [e.g., Heart Rate Variability, @pham2021heart] and brain activity [@lau2021brain]. It is an umbrella term for the usage of various complexity indices that quantify concepts such as chaos, entropy, fractal dimension, randomness, predictability, and information. Importantly, some of the most popular indices of entropy (e.g., *ApEn*, *SampEn*, their fuzzy and multiscale variations) and recurrence quantification analysis (RQA), rely on a similar set of parameters. Namely, these are the delay $\tau$, the embedding dimension *m*, and the tolerance *r*, which are critical to accurately capture the space in which complexity becomes quantifiable. Unfortunately, despite the existence of methods to estimate optimal values for these parameters depending on the signal at hand, their choice often relies on simple heuristics and cargo-cult conventions.
+Complexity analysis is a growing approach to physiological signals, including cardiac (e.g., Heart Rate Variability, [@pham2021heart]) and brain activity [@lau2021brain]. It is an umbrella term for the usage of various complexity indices that quantify concepts such as chaos, entropy, fractal dimension, randomness, predictability, and information. Importantly, some of the most popular indices of entropy (e.g., *ApEn*, *SampEn*, their fuzzy and multiscale variations) and recurrence quantification analysis (RQA), rely on a similar set of parameters. Namely, these are the delay $\tau$, the embedding dimension *m*, and the tolerance *r*, which are critical to accurately capture the space in which complexity becomes quantifiable. Unfortunately, despite the existence of methods to estimate optimal values for these parameters depending on the signal at hand, their choice often relies on simple heuristics and cargo-cult conventions.
 
 Such is the case of the tolerance threshold *r*, which typically corresponds to the minimal distance required to assigning two points in a state-space as belonging to the same state. It directly impacts the amount of "recurrences" of a system and the measure of its tendency to revisit past states, which is the base metric for the calculation of the aforementioned entropy indices. Despite its importance, it is often selected as a function of the standard deviation (SD) of the signal, with (in)famous magic values including $0.1$ or $0.2*SD$ [@pincus1992approximate]. One of the reason for the longevity of such approach is 1) the past literature (as many past studies used it, it becomes easier to justify the choice of the same values) and 2) the fact that other approaches to estimate the optimal *r* are computationally costly.
 
@@ -67,7 +67,7 @@ The aim of the present study is to investigate the relationship between differen
 
 ## Methods
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache}
 library(tidyverse)
 library(easystats)
 library(patchwork)
@@ -100,10 +100,10 @@ The aim of the analysis is to establish a new heuristic based only on the signal
 ## Results
 
 
-### Descriptive Results
+### Maximum Approximate Entropy
 
 
-```{r warning=FALSE, message=FALSE, cache=cache}
+```{r warning=FALSE, message=FALSE, cache=cache, eval=TRUE, fig.cap="Approximate Entropy *ApEn* as a function of tolerance *r* (expressed in signal SD) and embedding dimension *m*."}
 p <- df |> 
   mutate(group = paste0(Dimension, Method, Iter),
          m = Dimension) |> 
@@ -126,10 +126,10 @@ p <- df |>
   labs(x = expression("Tolerance"~italic("r")~"(in signal's SD)"), 
        y = "Approximate Entropy",
        color = "") 
-# p
-ggsave("figures/fig1-1.png", width=see::golden_ratio(9), height=9, dpi=300)
+p
+# ggsave("figures/fig1-1.png", width=see::golden_ratio(7), height=7, dpi=300)
 ```
-```{r fig1, echo=FALSE, fig.cap="Caption.", message=FALSE, warning=FALSE, cache=FALSE, out.width="100%", eval=FALSE}
+```{r fig1, echo=FALSE, fig.cap="Approximate Entropy *ApEn* as a function of tolerance *r* (expressed in signal SD) and embedding dimension *m*.", message=FALSE, warning=FALSE, cache=FALSE, out.width="100%", eval=FALSE}
 knitr::include_graphics("figures/fig1-1.png")
 ```
 
@@ -138,89 +138,6 @@ knitr::include_graphics("figures/fig1-1.png")
 as a function of tolerance *r* and embedding dimension *m*. As expected, the value of *ApEn* peaks at certain values of *r* (hence its usage as an indicator of the optimal tolerance). The location of this peak seems strongly impacted by the embedding dimension *m*, getting more variable - and on average larger - as *m* increases. 
 <!-- Does this peak consistently correspond to certain values of *NN* and *RR*? -->
 
-
-
-<!-- ### Using NN and RR -->
-
-<!-- ```{r message=FALSE, warning=FALSE, include=FALSE} -->
-<!-- data <- df |>  -->
-<!--   group_by(Dimension, Length, Iter) |>  -->
-<!--   filter(Method %in% c("Recurrence Rate", "Nearest Neighbours")) |>  -->
-<!--   filter(Tolerance == unique(Optimal_maxApEn)) |>  -->
-<!--   ungroup() -->
-
-<!-- m_NN0 <- lm(Tolerance ~ Score, data=filter(data, Method=="Nearest Neighbours")) -->
-<!-- m_NN1 <- lm(Tolerance ~ Score + Dimension, data=filter(data, Method=="Nearest Neighbours")) -->
-<!-- m_NN2 <- lm(Tolerance ~ Score + log(Dimension), data=filter(data, Method=="Nearest Neighbours")) -->
-<!-- m_NN3 <- lm(Tolerance ~ Score * Dimension, data=filter(data, Method=="Nearest Neighbours")) -->
-<!-- m_NN4 <- lm(Tolerance ~ Score * log(Dimension), data=filter(data, Method=="Nearest Neighbours")) -->
-
-<!-- test_bf(m_NN0, m_NN1, m_NN2, m_NN3, m_NN4, reference=4) -->
-
-<!-- # m_NN5 <- lm(Tolerance ~ Score * log(Dimension) + Length, data=filter(data, Method=="Nearest Neighbours")) -->
-<!-- # m_NN6 <- lm(Tolerance ~ Score * log(Dimension) * Length, data=filter(data, Method=="Nearest Neighbours")) -->
-<!-- #  -->
-<!-- # test_bf(m_NN4, m_NN5, m_NN6, reference=2) -->
-
-<!-- m_NN <- m_NN3 -->
-<!-- ``` -->
-
-<!-- ```{r warning=FALSE, message=FALSE, include=FALSE} -->
-<!-- m_RR0 <- lm(Tolerance ~ Score, data=filter(data, Method=="Recurrence Rate")) -->
-<!-- m_RR1 <- lm(Tolerance ~ Score + Dimension, data=filter(data, Method=="Recurrence Rate")) -->
-<!-- m_RR2 <- lm(Tolerance ~ Score + log(Dimension), data=filter(data, Method=="Recurrence Rate")) -->
-<!-- m_RR3 <- lm(Tolerance ~ Score * Dimension, data=filter(data, Method=="Recurrence Rate")) -->
-<!-- m_RR4 <- lm(Tolerance ~ Score * log(Dimension), data=filter(data, Method=="Recurrence Rate")) -->
-
-<!-- test_bf(m_RR0, m_RR1, m_RR2, m_RR3, m_RR4, reference=4) -->
-
-<!-- # m_RR5 <- lm(Tolerance ~ Score * log(Dimension) + Length, data=filter(data, Method=="Recurrence Rate")) -->
-<!-- # m_RR6 <- lm(Tolerance ~ Score * log(Dimension) * Length, data=filter(data, Method=="Recurrence Rate")) -->
-<!-- #  -->
-<!-- # test_bf(m_RR4, m_RR5, m_RR6, reference=2) -->
-
-<!-- m_RR <- m_RR3 -->
-<!-- ``` -->
-
-
-<!-- ```{r fig1b, warning=FALSE, message=FALSE, eval=FALSE} -->
-<!-- # filter(data, Method=="Nearest Neighbours") |> -->
-<!-- #   mutate(Dimension = as.factor(Dimension)) |>  -->
-<!-- #   ggplot(aes(x = Score, y = Tolerance, color=as.factor(Length))) + -->
-<!-- #   geom_point() + -->
-<!-- #   geom_line(data=mutate(estimate_prediction(m_NN), Dimension=as.factor(Dimension)), aes(y=Predicted)) + -->
-<!-- #   facet_wrap(~Dimension, scales = "free") -->
-<!-- means <- estimate_means(m_RR, at = list("Dimension" = unique(data$Dimension))) |>  -->
-<!--   mutate(Method = "Recurrence Rate") |>  -->
-<!--   rbind( -->
-<!--     estimate_means(m_NN, at = list("Dimension" = unique(data$Dimension))) |>  -->
-<!--       mutate(Method = "Nearest Neighbours"))  |>  -->
-<!--   mutate(m = paste0("m = ", Dimension), -->
-<!--          m = fct_rev(as.factor(m))) -->
-
-<!-- data |>  -->
-<!--   mutate(m = paste0("m = ", Dimension), -->
-<!--          m = fct_rev(as.factor(m))) |> -->
-<!--   ggplot(aes(y = Optimal_maxApEn, x = Score)) + -->
-<!--   geom_point2(aes(color=m), alpha=0.33) + -->
-<!--   geom_vline(data=means, aes(xintercept=Mean, group=Dimension)) + -->
-<!--   facet_grid(m ~ Method, switch="x") +  # labeller=purrr::partial(label_both, sep = " = "),  -->
-<!--   scale_color_viridis_d(option="inferno", direction=-1) + -->
-<!--   guides(color="none") + -->
-<!--   theme_modern() + -->
-<!--   theme(strip.placement = "outside", -->
-<!--         axis.title.x = element_blank()) -->
-<!-- ``` -->
-
-<!-- In order to assess whether the amount of nearest neighbours *NN* and the Recurrence Rate *RR* can be used as alternative metrics to approximate the optimal tolerance threshold *r* (as estimated by *max. ApEn*), we fitted for each index 3 regression models to predict the index' value that corresponds to the location of *max. ApEn*: one without the embedding dimension *m* as predictor, one with it, and one with the dimension's logarithm. For both *NN* and *RR*, the model with the raw dimension as predictor was the best $BF_{10} > 1000$.  -->
-
-<!-- However, *NN* did not share a strong relationship with the embedding dimension, as the explained variance of its (best-performing) model was low ($R^2$ = `r insight::format_value(performance::r2(m_NN)$R2, as_percent=TRUE)`). It was higher for the model based on *RR* ($R^2$ = `r insight::format_value(performance::r2(m_RR)$R2, as_percent=TRUE)`). The models were as follows:  -->
-
-<!-- `r equatiomatic::extract_eq(m_NN, swap_var_names=c("Score" = "NN"), use_coefs = TRUE, ital_vars=TRUE, coef_digits=4)` -->
-
-<!-- `r equatiomatic::extract_eq(m_RR, swap_var_names=c("Score" = "RR"), use_coefs = TRUE, ital_vars=TRUE, coef_digits=4)` -->
-
-<!-- According to these models, for an embedding dimension of 2, the target *NN* and *RR* values are `r insight::format_value(predict(m_NN, data.frame(Dimension=2)), digits=1, as_percent=TRUE)` and `r insight::format_value(predict(m_RR, data.frame(Dimension=2)), digits=1, as_percent=TRUE)`, respectively. -->
 
 
 ### New Heuristic
@@ -250,7 +167,7 @@ m <- m5
 
 
 
-```{r fig2, warning=FALSE, message=FALSE}
+```{r fig2, warning=FALSE, message=FALSE, fig.cap="Optimal tolerance values approximated by a new heuristic model based on the embedding dimension *m* and the signal length *n* (in samples). The density plots show the true optimal tolernace values as based on max. ApEn."}
 library(ggdist)
 
 pred <- modelbased::estimate_relation(m, length = NA) |> 
@@ -261,7 +178,7 @@ formula <- equatiomatic::extract_eq(m,
                                     raw_tex=TRUE, 
                                     swap_var_names=c("maxApEn" = "r", 
                                                      "Dimension" = "m-1", 
-                                                     "log(Length)" = "log(length)"),
+                                                     "log(Length)" = "log(n)"),
                                     use_coefs = TRUE, 
                                     ital_vars=TRUE, 
                                     coef_digits=4)
@@ -283,7 +200,7 @@ data |>
   scale_y_discrete(expand=c(0, 0)) +
   see::theme_modern() +
   guides(group="none", fill=guide_legend(override.aes = list(alpha = 1))) +
-  labs(x = "Optimal Tolerance (based on max. ApEn)", y=expression("Embedding Dimension"~italic("m")), fill="Signal Length", color="Signal Length")
+  labs(x = expression("Optimal Tolerance"~italic("r")~"(based on max. ApEn)"), y=expression("Embedding Dimension"~italic("m")), fill="Signal Length", color="Signal Length")
 ```
 
 Selecting the tolerance based on the signal's SD alone makes hardly sense, as the embedding dimension has a strong impact on it. In order to validate a new heuristic to approximate the optimal *r* value based on the embedding dimension *m* and the signal's length, we compared different regression specifications using the BIC-based Bayes Factor test. The model including the log-transformed signal length (in samples) and the embedding dimension *m* minus 1 (with no intercept) performed significantly better ($BF_{10} > 1000$) than any other version, with an explained variance of `r insight::format_value(performance::r2(m)$R2, as_percent=TRUE)`. Based on this simple regression model, we can derive the following approximation (assuming a standardized signal with an SD of 1): 
@@ -348,7 +265,7 @@ perf |>
 ```
 
 We compared together different methods to approximate $r_{maxApEn}$ (see **Table 1**) by comparing $r_{maxApEn}$ (our ground-truth) to the value estimated by different methods. Our heuristic method presented in this study, based on the signal's SD, the embedding dimension and the log-transformed length, surpassed any other models ($BF_{10} > 1000$, $R^2$ = `r format_value(r2(Makowski)$R2)`), and was followed by the *Schötzel* adjustment ($R^2$ = `r format_value(r2(Scholzel)$R2)`). 
-<!-- The methods based on *RR* ($R^2$ = `r format_value(r2(RR)$R2)`) and *NN* ($R^2$ = `r format_value(r2(NN)$R2)`) were next, followed the *Chon* adjustment ($R^2$ = `r format_value(r2(Chon)$R2)`) and, finally, the fixed 0.2 SD value. -->
+
 
 
 ## Discussion

@@ -8,11 +8,9 @@ Model & BIC & R2 & BF \\
 Model & BIC & R2 & BF \\
 \midrule()
 \endhead
-Makowski & -17820.13 & 0.77 & 1.00 \\
-Scholzel & -14317.36 & 0.74 & \textless{} 0.001 \\
-RR & -5691.58 & 0.64 & \textless{} 0.001 \\
-NN & -4435.10 & 0.62 & \textless{} 0.001 \\
-Chon & 13318.91 & 0.25 & \textless{} 0.001 \\
-SD & 20694.14 & 0.00 & \textless{} 0.001 \\
+Makowski & -41375.73 & 0.77 & 1.00 \\
+Scholzel & -24637.03 & 0.68 & 0.00e+00 \\
+Chon & 24614.17 & 0.18 & 0.00e+00 \\
+SD & 35119.90 & 0.00 & 0.00e+00 \\
 \bottomrule()
 \end{longtable}

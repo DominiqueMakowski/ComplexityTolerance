@@ -1,0 +1,5 @@
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+\includegraphics[width=1\linewidth]{figures/fig1-1} \caption{Caption.}\label{fig:fig1}
+\end{figure*}

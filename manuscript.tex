@@ -3,7 +3,7 @@
 \PassOptionsToPackage{hyphens}{url}
 %
 \documentclass[
-  man]{apa6}
+  man,floatsintext]{apa6}
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
 \usepackage{iftex}
@@ -165,13 +165,7 @@
     {}{\InnerPatchFailed}%
   }
 {}{\PatchFailed}
-\keywords{chaos, complexity, fractal, physiology, tolerance\newline\indent Word count: 1156}
-\DeclareDelayedFloatFlavor{ThreePartTable}{table}
-\DeclareDelayedFloatFlavor{lltable}{table}
-\DeclareDelayedFloatFlavor*{longtable}{table}
-\makeatletter
-\renewcommand{\efloat@iwrite}[1]{\immediate\expandafter\protected@write\csname efloat@post#1\endcsname{}}
-\makeatother
+\keywords{chaos, complexity, entropy, tolerance, r, physiology\newline\indent Word count: 925}
 \usepackage{lineno}
 
 \linenumbers
@@ -191,14 +185,14 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same} % disable monospaced font for URLs
 \hypersetup{
-  pdftitle={Optimal Selection of Tolerance r for Entropy Indices},
+  pdftitle={A New Heuristic Method for the Optimal Selection of Tolerance r for Entropy Indices},
   pdfauthor={Dominique Makowski1},
   pdflang={en-EN},
-  pdfkeywords={chaos, complexity, fractal, physiology, tolerance},
+  pdfkeywords={chaos, complexity, entropy, tolerance, r, physiology},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 
-\title{\textbf{Optimal Selection of Tolerance \emph{r} for Entropy Indices}}
+\title{\textbf{A New Heuristic Method for the Optimal Selection of Tolerance \emph{r} for Entropy Indices}}
 \author{Dominique Makowski\textsuperscript{1}}
 \date{}
 
@@ -214,7 +208,7 @@ Correspondence concerning this article should be addressed to Dominique Makowski
 \affiliation{\vspace{0.5cm}\textsuperscript{1} School of Social Sciences, Nanyang Technological University, Singapore}
 
 \abstract{%
-The tolerance threshold \emph{r} is a key parameter of several entropy algorithms (e.g., \emph{SampEn}). Unfortunately, the gold standard method to estimate its optimal value - the one that maximizes \emph{ApEn} - is computationally costly, prompting users to rely to cargo-cult heuristics such as 0.2 * SD. In this study, we first compared the relationship bewteen the amount of Nearest Neighbours (\emph{NN}) and the Recurrence Rate (\emph{RR}), and showed that these values cannot be used to approximate the optimal \emph{r} value. Secondly, we established a new heuristic, based only on the signal's SD and the embedding dimension \emph{m} (optimal \emph{r} = -0.032 + 0.1497 * \emph{m}), which was superior to other existing heuristics. All the methods of optimal tolerance \emph{r} estimation used in this study are available in the \emph{NeuroKit2} Python software (Makowski et al., 2021).
+The tolerance threshold \emph{r} is a key parameter of several entropy algorithms (e.g., \emph{SampEn}). Unfortunately, the gold standard method to estimate its optimal value - the one that maximizes \emph{ApEn} - is computationally costly, prompting users to rely to cargo-cult rules-of-thumb such as 0.2 * SD. In this simulation study, we attempted at validating a new heuristic, based on the embedding dimension \emph{m} and the signal's length \emph{n} (optimal \emph{r} = SD * 0.281(\emph{m}-1) + 0.005(log(\emph{n})) - 0.02(\emph{m}-1 * log(\emph{n}))), which was superior to other existing heuristics. All the methods of optimal tolerance \emph{r} estimation used in this study are available in the \emph{NeuroKit2} Python software (Makowski et al., 2021).
 }
 
 
@@ -225,56 +219,50 @@ The tolerance threshold \emph{r} is a key parameter of several entropy algorithm
 \hypertarget{introduction}{%
 \subsection{Introduction}\label{introduction}}
 
-Complexity analysis is a growing approach to physiological signals, including cardiac {[}e.g., Heart Rate Variability; {[}1{]}{]} and brain activity {[}2{]}. It is an umbrella term for the usage of various complexity indices that quantify concepts such as chaos, entropy, fractal dimension, randomness, predictability, and information. Importantly, some of the most popular indices of entropy (e.g., \emph{ApEn}, \emph{SampEn}, their fuzzy and multiscale variations) and recurrence quantification analysis (RQA), rely on the same subset of parameters. Namely, these are the delay \(\tau\), the embedding dimension \emph{m}, and the tolerance \emph{r}, which are critical to accurately capture the space in which complexity becomes quantifiable. Unfortunately, despite the existence of methods to estimate optimal values for these parameters depending on the signal at hand, their choice often relies on simple heuristics or cargo-cult conventions.
+Complexity analysis is a growing approach to physiological signals, including cardiac (e.g., Heart Rate Variability, {[}1{]}) and brain activity {[}2{]}. It is an umbrella term for the usage of various complexity indices that quantify concepts such as chaos, entropy, fractal dimension, randomness, predictability, and information. Importantly, some of the most popular indices of entropy (e.g., \emph{ApEn}, \emph{SampEn}, their fuzzy and multiscale variations) and recurrence quantification analysis (RQA), rely on a similar set of parameters. Namely, these are the delay \(\tau\), the embedding dimension \emph{m}, and the tolerance \emph{r}, which are critical to accurately capture the space in which complexity becomes quantifiable. Unfortunately, despite the existence of methods to estimate optimal values for these parameters depending on the signal at hand, their choice often relies on simple heuristics and cargo-cult conventions.
 
-Such is the case of the tolerance threshold \emph{r}, which typically corresponds to the minimal distance required to assigning two points in a state-space as belonging to the same state. It directly impacts the amount of ``recurrences'' of a system and its tendency to revisit past states, which is the base metric for the calculation of the aforementioned entropy indices. Despite its importance, it is often selected as a function of the standard deviation (SD) of the signal, with (in)famous magic values including \(0.1\) or \(0.2*SD\) {[}3{]}. One of the reason for the longevity of such approach is 1) past literature (as many past studies used it, it becomes easier to justify the choice of the same values) and 2) the fact that other approaches to estimate the optimal \emph{r} are computationally costly.
+Such is the case of the tolerance threshold \emph{r}, which typically corresponds to the minimal distance required to assigning two points in a state-space as belonging to the same state. It directly impacts the amount of ``recurrences'' of a system and the measure of its tendency to revisit past states, which is the base metric for the calculation of the aforementioned entropy indices. Despite its importance, it is often selected as a function of the standard deviation (SD) of the signal, with (in)famous magic values including \(0.1\) or \(0.2*SD\) {[}3{]}. One of the reason for the longevity of such approach is 1) the past literature (as many past studies used it, it becomes easier to justify the choice of the same values) and 2) the fact that other approaches to estimate the optimal \emph{r} are computationally costly.
 
-The aim of the present study is to investigate the relationship between different methods for optimal tolerance \emph{r} estimation. The ground-truth method used is the tolerance value corresponding to a maximal value of Approximate Entropy - \emph{ApEn} {[}4--6{]}. As this method is computationally expensive, the objective is to see whether any heuristic proxies can be used to satisfyingly approximate the ground-truth value.
+The aim of the present study is to investigate the relationship between different methods for optimal tolerance \emph{r} estimation. The ground-truth method used is the tolerance value corresponding to a maximal value of Approximate Entropy - \emph{ApEn} {[}4--6{]}. As this method is computationally expensive, the objective is to see whether any heuristic proxies can be used to satisfyingly approximate \(r_{maxApEn}\).
 
 \hypertarget{methods}{%
 \subsection{Methods}\label{methods}}
 
-For \emph{n} = 2880 combinations of different signal types and lengths, as well as noise types and intensities (the procedure used was the same as in \ldots, and the data generation code is available at \textbf{\url{https://github.com/DominiqueMakowski/ComplexityTolerance}}), we will compute 3 different scores as a function of difference tolerance values (expressed in SDs of the signal): Approximate Entropy (\emph{ApEn}), which peak is used to estimate the optimal tolerance level; the average number of nearest neighbours \emph{NN}, which is the underlying quantity used by several entropy algorithms; and the recurrence rate \emph{RR}, one of the core index of recurrence quantification analysis (RQA). These 3 scores are computed based on time-delay embedding spaces that we will create ranging from of 1 to 9 embedding dimensions \emph{m}.
+For \emph{n} = 5760 combinations of different signal types and lengths, as well as noise types and intensities (the procedure used was the same as in {[}7{]}, and the data generation code is available at \textbf{\url{https://github.com/DominiqueMakowski/ComplexityTolerance}}), we computed the Approximate Entropy (\emph{ApEn}), which peak is used to estimate the optimal tolerance level for time-delay embedding spaces ranging from of 1 to 9 embedding dimensions \emph{m}.
 
-The goal of the analysis is to 1) investigate the possibility of using alternative scores, namely \emph{RR} and \emph{NN}, to approximate the location of the \emph{ApEn} peak; 2) establish a new heuristic based on signal's SD and Dimension; and 3) compare all of these approximations with other existing heuristics such as \emph{0.2 SD}, \emph{Chon} {[}6{]}, and the \emph{Schötzel} method implemented in the package \emph{nolds} {[}7{]}.
+The aim of the analysis is to establish a new heuristic based only on the signal's SD and the embedding dimension \emph{m}; and compare all of these approximations with other existing heuristics such as \emph{0.2 SD}, \emph{Chon} {[}6{]}, and the \emph{Schötzel} method (\(1.3334 + 0.5627 * log(dimension)\)) implemented in the package \emph{nolds} {[}8{]}.
 
 \hypertarget{results}{%
 \subsection{Results}\label{results}}
 
-\hypertarget{descriptive-results}{%
-\subsubsection{Descriptive Results}\label{descriptive-results}}
+\hypertarget{maximum-approximate-entropy}{%
+\subsubsection{Maximum Approximate Entropy}\label{maximum-approximate-entropy}}
 
-\textbf{Figure 1} shows the normalized value of Approximate Entropy \emph{ApEn}, the amount of nearest neighbours \emph{NN} and the Recurrence Rate \emph{RR} as a function of tolerance \emph{r}. As expected, the value of \emph{ApEn} peaks at certain values of \emph{r} (hence its usage as an indicator of the optimal tolerance). The location of this peak seems strongly impacted by the embedding dimension \emph{m}, getting more variable as \emph{m} increases. Does this peak consistently correspond to certain values of \emph{NN} and \emph{RR}?
+\begin{figure}
+\centering
+\includegraphics{figures/unnamed-chunk-3-1.pdf}
+\caption{\label{fig:unnamed-chunk-3}Approximate Entropy \emph{ApEn} as a function of tolerance \emph{r} (expressed in signal SD) and embedding dimension \emph{m}.}
+\end{figure}
 
-\hypertarget{using-nn-and-rr}{%
-\subsubsection{Using NN and RR}\label{using-nn-and-rr}}
-
-In order to assess whether the amount of nearest neighbours \emph{NN} and the Recurrence Rate \emph{RR} can be used to approximate the optimal tolerance threshold \emph{r} (as estimated by \emph{max. ApEn}), we fitted for each index 3 regression models to predict the index' value that corresponds to the location of \emph{max. ApEn}: one without the embedding dimension \emph{m} as predictor, one with it, and one with the dimension's logarithm. For both \emph{NN} and \emph{RR}, the model with the log-transform dimension as predictor was the best \(BF_{10} > 1000\). However, \emph{NN} did not share a strong relationship with the embedding dimension, as the explained variance of its (best-performing) model was low (\(R^2\) = 2.20\%). It was higher for the model based on \emph{RR} (\(R^2\) = 50.39\%). The models were as follows:
-
-\begin{equation}
-\widehat{NN} = 0.0221 - 0.0107(\log(Dimension))
-\end{equation}
-
-\begin{equation}
-\widehat{RR} = 0.0221 - 0.0107(\log(Dimension))
-\end{equation}
-
-According to these models, for an embedding dimension of 2, the target \emph{NN} and \emph{RR} values are 1.9\% and 1.5\%, respectively.
+\textbf{Figure 1} shows the normalized value of Approximate Entropy \emph{ApEn}
+as a function of tolerance \emph{r} and embedding dimension \emph{m}. As expected, the value of \emph{ApEn} peaks at certain values of \emph{r} (hence its usage as an indicator of the optimal tolerance). The location of this peak seems strongly impacted by the embedding dimension \emph{m}, getting more variable - and on average larger - as \emph{m} increases.
 
 \hypertarget{new-heuristic}{%
 \subsubsection{New Heuristic}\label{new-heuristic}}
 
-Because computing \emph{RR} or \emph{NN} is also an expensive procedure, we also attempted at validating a new heuristic based only on the signal's \emph{SD} and the embedding dimension \emph{m}.
+\begin{figure}
+\centering
+\includegraphics{figures/fig2-1.pdf}
+\caption{\label{fig:fig2}Optimal tolerance values approximated by a new heuristic model based on the embedding dimension \emph{m} and the signal length \emph{n} (in samples). The density plots show the true optimal tolernace values as based on max. ApEn.}
+\end{figure}
 
-\includegraphics{/figures/fig2-1.pdf}
-
-Selecting the tolerance based on the signal's SD alone makes hardly sense, as the embedding dimension has a strong impact on it. We fitted two models to predict the optimal tolerance (as estimated by \emph{max. ApEn}), with the embedding dimension and its log-transformation as predictors, respectively. The model without the log-transformation performed significantly better (\(BF_{10} > 1000\)), with an explained variance of 77.38\%. Based on this simple regression model, we can derive the following approximation (assuming a standardized signal with an SD of 1):
+Selecting the tolerance based on the signal's SD alone makes hardly sense, as the embedding dimension has a strong impact on it. In order to validate a new heuristic to approximate the optimal \emph{r} value based on the embedding dimension \emph{m} and the signal's length, we compared different regression specifications using the BIC-based Bayes Factor test. The model including the log-transformed signal length (in samples) and the embedding dimension \emph{m} minus 1 (with no intercept) performed significantly better (\(BF_{10} > 1000\)) than any other version, with an explained variance of 92.64\%. Based on this simple regression model, we can derive the following approximation (assuming a standardized signal with an SD of 1):
 
 \begin{equation}
-\widehat{maxApEn} = -0.0417 + 0.1228(Dimension)
+\widehat{r} = 0.2811(m-1) + 0.0049(\log(n)) - 0.02(m-1 \times \log(n))
 \end{equation}
 
-Interestingly, for a dimension \emph{m} of 2, this equation approximates the \emph{0.2 SD} heuristic (\emph{r} = 0.204), which actually was initially derived under this condition.
+It is to note that shorter signals require larger tolerance values, and the impact of length lowers as the signal gets longer. Also, for a dimension \emph{m} of 2 (and short signal lengths), this equation returns close results to the \emph{0.2 SD} heuristic, which is not entirely surprising as the latter was initially derived under such conditions (that are typical of some applications, such as heart-rate intervals).
 
 \hypertarget{heuristics-comparison}{%
 \subsubsection{Heuristics Comparison}\label{heuristics-comparison}}
@@ -289,25 +277,24 @@ Model & BIC & R2 & BF \\
 Model & BIC & R2 & BF \\
 \midrule()
 \endhead
-Makowski & -17820.13 & 0.77 & 1.00 \\
-Scholzel & -14317.36 & 0.74 & \textless{} 0.001 \\
-RR & -5691.58 & 0.64 & \textless{} 0.001 \\
-NN & -4435.10 & 0.62 & \textless{} 0.001 \\
-Chon & 13318.91 & 0.25 & \textless{} 0.001 \\
-SD & 20694.14 & 0.00 & \textless{} 0.001 \\
+Makowski & -41375.73 & 0.77 & 1.00 \\
+Scholzel & -24637.03 & 0.68 & 0.00e+00 \\
+Chon & 24614.17 & 0.18 & 0.00e+00 \\
+SD & 35119.90 & 0.00 & 0.00e+00 \\
 \bottomrule()
 \end{longtable}
 
-We compared together different approximations of \(r_{maxApEn}\) (see \textbf{Table 1}). Our heuristic method presented in this study, based on the signal's SD and the embedding dimension, surpassed any other models (\(BF_{10} > 1000\), \(R^2\) = 0.77), followed by the \emph{Schötzel} adjustment (\(R^2\) = 0.74). The methods based on \emph{RR} (\(R^2\) = 0.64) and \emph{NN} (\(R^2\) = 0.62) were next, followed the \emph{Chon} adjustment (\(R^2\) = 0.25) and, finally, the fixed 0.2 SD value.
+We compared together different methods to approximate \(r_{maxApEn}\) (see \textbf{Table 1}) by comparing \(r_{maxApEn}\) (our ground-truth) to the value estimated by different methods. Our heuristic method presented in this study, based on the signal's SD, the embedding dimension and the log-transformed length, surpassed any other models (\(BF_{10} > 1000\), \(R^2\) = 0.77), and was followed by the \emph{Schötzel} adjustment (\(R^2\) = 0.68).
 
 \hypertarget{discussion}{%
 \subsection{Discussion}\label{discussion}}
 
 The tolerance threshold \emph{r} is a key parameter of several entropy algorithms, including widely popular ones like \emph{SampEn}. The current gold standard method to estimate the optimal \emph{r} is to compute Approximate Entropy (\emph{ApEn}) over a range of different \emph{r} values and to select the one corresponding to the maximum \emph{ApEn} value. Unfortunately, this method is computationally costly.
 
-In this study, we have shown that a simple heuristic approximation based on the signal's SD and the embedding dimension \emph{m} was the best at approximating \(r_{maxApEn}\), showing superior performance to procedures involving state-phase reconstruction related quantities, such as the amount of Nearest Neighbours (\emph{NN}) and the Recurrence Rate (\emph{RR}). We suggest the use of this method as a default alternative to the \emph{0.2 SD} rule of thumb.
+In this study, we have shown that a simple heuristic approximation based on the embedding dimension \emph{m} and the log-transformed signal length was a valid approximation of \(r_{maxApEn}\), showing superior performance to other heuristic methods.
+We suggest the use of this method as a default alternative to the \emph{0.2 SD} rule of thumb.
 
-While we believe that our data generation procedure was able to generate a wide variety of signals, and that our results are to some extent generalizable, future studies could attempt at refining the estimation procedures for specific signals (for instance, EEG, or heart rate data). All the methods of optimal tolerance \emph{r} estimation used in this study are available in the \emph{NeuroKit2} open-source Python software {[}8{]}.
+While we believe that our data generation procedure was able to generate a wide variety of signals, and that our results are to some extent generalizable, future studies could attempt at refining the estimation procedures for specific signals (for instance, EEG, or heart rate data). All the methods of optimal tolerance \emph{r} estimation used in this study, including our new proposal, are available in the \emph{NeuroKit2} open-source Python software, \texttt{complexity\_tolerance()} function {[}9{]}.
 
 \newpage
 
@@ -340,12 +327,16 @@ While we believe that our data generation procedure was able to generate a wide 
 \CSLLeftMargin{6. }%
 \CSLRightInline{Chon, K.H.; Scully, C.G.; Lu, S. Approximate Entropy for All Signals. \emph{IEEE engineering in medicine and biology magazine} \textbf{2009}, \emph{28}, 18--23.}
 
-\leavevmode\vadjust pre{\hypertarget{ref-scholzel2019nolds}{}}%
+\leavevmode\vadjust pre{\hypertarget{ref-makowski2022structure}{}}%
 \CSLLeftMargin{7. }%
+\CSLRightInline{Makowski, D.; Te, A.S.; Pham, T.; Lau, Z.J.; Chen, S.H.A. The Structure of Chaos: An Empirical Comparison of Fractal Physiology Complexity Indices Using {NeuroKit}2. \emph{Entropy} \textbf{2022}, \emph{24}, 1036, doi:\href{https://doi.org/10.3390/e24081036}{10.3390/e24081036}.}
+
+\leavevmode\vadjust pre{\hypertarget{ref-scholzel2019nolds}{}}%
+\CSLLeftMargin{8. }%
 \CSLRightInline{Schölzel, C. \emph{\href{https://doi.org/10.5281/zenodo.3814723}{Nonlinear Measures for Dynamical Systems}}; Zenodo, 2019;}
 
 \leavevmode\vadjust pre{\hypertarget{ref-makowski2021neurokit2}{}}%
-\CSLLeftMargin{8. }%
+\CSLLeftMargin{9. }%
 \CSLRightInline{Makowski, D.; Pham, T.; Lau, Z.J.; Brammer, J.C.; Lespinasse, F.; Pham, H.; Schölzel, C.; Chen, S. NeuroKit2: A Python Toolbox for Neurophysiological Signal Processing. \emph{Behavior research methods} \textbf{2021}, \emph{53}, 1689--1696.}
 
 \end{CSLReferences}
