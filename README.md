@@ -1,13 +1,13 @@
 
-# The Structure of Chaos: An Empirical Comparison of Fractal Physiology Complexity Indices using NeuroKit2
+# A New Heuristic Method for the Optimal Selection of Tolerance *r* for Entropy Indices
 
-- See the open-access [**preprint**](https://psyarxiv.com/v5tqw/).
+- See the open-access [**preprint**](https://github.com/DominiqueMakowski/ComplexityTolerance/blob/main/manuscript.pdf).
 - Data generation [**script**](make_data.py)
-- Data analysis [**script**](analysis.Rmd)
+- Data analysis [**script**](manuscript.Rmd)
 
 
 ## Abstract
 
-Complexity quantification, through entropy, information theory and fractal dimension indices, is gaining a renewed traction in psychophsyiology, as new measures with promising qualities emerge from the computational and mathematical advances. Unfortunately, few studies compare the relationship and objective performance of the plethora of existing metrics, in turn hindering reproducibility, replicability, consistency, and clarity in the field. Using the NeuroKit2 Python software, we computed a list of 112 complexity indices on signals varying in their characteristics (noise, length and frequency spectrum). We then systematically compared the indices by their computational weight, their representativeness of a multidimensional space of latent dimensions, and empirical proximity with other indices. Based on these considerations, we propose that a selection of 12 indices, together representing 85.97\\% of the total variance of all indices, might offer a parsimonious and complimentary choice in regards to the quantification of the complexity of time series. Our selection includes *CWPEn*, *Line Length (LL)*, *BubbEn*, *MSWPEn*, *MFDFA (Max)*, *Hjorth Complexity*, *SVDEn*, *MFDFA (Width)*, *MFDFA (Mean)*, *MFDFA (Peak)*, *MFDFA (Fluctuation)*, *AttEn*. Elements of consideration for alternative subsets are discussed, and data, analysis scripts and code for the figures are open-source.
+The tolerance threshold *r* is a key parameter of several entropy algorithms (e.g., *SampEn*). Unfortunately, the gold standard method to estimate its optimal value - i.e., the one that maximizes *ApEn* - is computationally costly, prompting users to rely on cargo-cult rules-of-thumb such as 0.2 * SD. This simulation study aims at validating a new heuristic, based on the embedding dimension *m* and the signal's length *n* (optimal *r* = SD \* 0.281(*m*-1) + 0.005(log(*n*)) - 0.02(*m*-1 \* log(*n*))), which was found to be superior to other existing heuristics. All the methods of optimal tolerance *r* estimation used in this study are available in the *NeuroKit2* Python software (Makowski et al., 2021).
 
-![](figures/loadings-1.png)
+![](figures/fig2-1.png)
