@@ -208,7 +208,7 @@ Correspondence concerning this article should be addressed to Dominique Makowski
 \affiliation{\vspace{0.5cm}\textsuperscript{1} School of Social Sciences, Nanyang Technological University, Singapore}
 
 \abstract{%
-The tolerance threshold \emph{r} is a key parameter of several entropy algorithms (e.g., \emph{SampEn}). Unfortunately, the gold standard method to estimate its optimal value - the one that maximizes \emph{ApEn} - is computationally costly, prompting users to rely to cargo-cult rules-of-thumb such as 0.2 * SD. In this simulation study, we attempted at validating a new heuristic, based on the embedding dimension \emph{m} and the signal's length \emph{n} (optimal \emph{r} = SD * 0.281(\emph{m}-1) + 0.005(log(\emph{n})) - 0.02(\emph{m}-1 * log(\emph{n}))), which was superior to other existing heuristics. All the methods of optimal tolerance \emph{r} estimation used in this study are available in the \emph{NeuroKit2} Python software (Makowski et al., 2021).
+The tolerance threshold \emph{r} is a key parameter of several entropy algorithms (e.g., \emph{SampEn}). Unfortunately, the gold standard method to estimate its optimal value - i.e., the one that maximizes \emph{ApEn} - is computationally costly, prompting users to rely on cargo-cult rules-of-thumb such as 0.2 * SD. This simulation study aims at validating a new heuristic, based on the embedding dimension \emph{m} and the signal's length \emph{n} (optimal \emph{r} = SD * 0.281(\emph{m}-1) + 0.005(log(\emph{n})) - 0.02(\emph{m}-1 * log(\emph{n}))), which was found to be superior to other existing heuristics. All the methods of optimal tolerance \emph{r} estimation used in this study are available in the \emph{NeuroKit2} Python software (Makowski et al., 2021).
 }
 
 
@@ -219,11 +219,11 @@ The tolerance threshold \emph{r} is a key parameter of several entropy algorithm
 \hypertarget{introduction}{%
 \subsection{Introduction}\label{introduction}}
 
-Complexity analysis is a growing approach to physiological signals, including cardiac (e.g., Heart Rate Variability, {[}1{]}) and brain activity {[}2{]}. It is an umbrella term for the usage of various complexity indices that quantify concepts such as chaos, entropy, fractal dimension, randomness, predictability, and information. Importantly, some of the most popular indices of entropy (e.g., \emph{ApEn}, \emph{SampEn}, their fuzzy and multiscale variations) and recurrence quantification analysis (RQA), rely on a similar set of parameters. Namely, these are the delay \(\tau\), the embedding dimension \emph{m}, and the tolerance \emph{r}, which are critical to accurately capture the space in which complexity becomes quantifiable. Unfortunately, despite the existence of methods to estimate optimal values for these parameters depending on the signal at hand, their choice often relies on simple heuristics and cargo-cult conventions.
+Complexity analysis is an increasingly popular approach to physiological signals, including cardiac (e.g., Heart Rate Variability, {[}1{]}) and brain activity {[}2{]}. It is an umbrella term for the usage of various complexity indices that quantify concepts such as chaos, entropy, fractal dimension, randomness, predictability, and information. Importantly, some of the most popular indices of entropy (e.g., \emph{ApEn}, \emph{SampEn}, their fuzzy and multiscale variations) and recurrence quantification analysis (RQA), rely on a similar set of parameters. Namely, these are the delay \(\tau\), the embedding dimension \emph{m}, and the tolerance \emph{r}, which are critical to accurately capture the space in which complexity becomes quantifiable. Unfortunately, despite the existence of methods to estimate optimal values for these parameters depending on the signal at hand, their choice often relies on simple heuristics and cargo-cult conventions.
 
-Such is the case of the tolerance threshold \emph{r}, which typically corresponds to the minimal distance required to assigning two points in a state-space as belonging to the same state. It directly impacts the amount of ``recurrences'' of a system and the measure of its tendency to revisit past states, which is the base metric for the calculation of the aforementioned entropy indices. Despite its importance, it is often selected as a function of the standard deviation (SD) of the signal, with (in)famous magic values including \(0.1\) or \(0.2*SD\) {[}3{]}. One of the reason for the longevity of such approach is 1) the past literature (as many past studies used it, it becomes easier to justify the choice of the same values) and 2) the fact that other approaches to estimate the optimal \emph{r} are computationally costly.
+Such is the case of the tolerance threshold \emph{r}, which typically corresponds to the minimal distance required to assign two points in a state-space as belonging to the same state. It directly impacts the amount of ``recurrences'' of a system and the measure of its tendency to revisit past states, which is the base metric for the calculation of the aforementioned entropy indices. Despite its importance, it is often selected as a function of the standard deviation (SD) of the signal, with (in)famous arbitrary values including \(0.1\) or \(0.2*SD\) {[}3{]}. One of the reason for the longevity of such an approach is 1) the past literature (as it is consistently used in the existing literature, the choice of the same values becomes the default and does not require much justification) and 2) the fact that other algorithms to estimate the optimal \emph{r} are computationally costly.
 
-The aim of the present study is to investigate the relationship between different methods for optimal tolerance \emph{r} estimation. The ground-truth method used is the tolerance value corresponding to a maximal value of Approximate Entropy - \emph{ApEn} {[}4--6{]}. As this method is computationally expensive, the objective is to see whether any heuristic proxies can be used to satisfyingly approximate \(r_{maxApEn}\).
+The aim of the present study is to investigate the relationship between different methods for optimal tolerance \emph{r} estimation. The ground-truth method used is the tolerance value corresponding to a maximal value of Approximate Entropy - \emph{ApEn} {[}4--6{]}. As this method is computationally expensive, the objective of this study is to assess whether fast heuristic proxies can be used to approximate \(r_{maxApEn}\).
 
 \hypertarget{methods}{%
 \subsection{Methods}\label{methods}}
@@ -240,8 +240,8 @@ The aim of the analysis is to establish a new heuristic based only on the signal
 
 \begin{figure}
 \centering
-\includegraphics{figures/unnamed-chunk-3-1.pdf}
-\caption{\label{fig:unnamed-chunk-3}Approximate Entropy \emph{ApEn} as a function of tolerance \emph{r} (expressed in signal SD) and embedding dimension \emph{m}.}
+\includegraphics{figures/fig1-1.pdf}
+\caption{\label{fig:fig1}Approximate Entropy \emph{ApEn} as a function of tolerance \emph{r} (expressed in signal SD) and embedding dimension \emph{m}.}
 \end{figure}
 
 \textbf{Figure 1} shows the normalized value of Approximate Entropy \emph{ApEn}
@@ -256,13 +256,13 @@ as a function of tolerance \emph{r} and embedding dimension \emph{m}. As expecte
 \caption{\label{fig:fig2}Optimal tolerance values approximated by a new heuristic model based on the embedding dimension \emph{m} and the signal length \emph{n} (in samples). The density plots show the true optimal tolernace values as based on max. ApEn.}
 \end{figure}
 
-Selecting the tolerance based on the signal's SD alone makes hardly sense, as the embedding dimension has a strong impact on it. In order to validate a new heuristic to approximate the optimal \emph{r} value based on the embedding dimension \emph{m} and the signal's length, we compared different regression specifications using the BIC-based Bayes Factor test. The model including the log-transformed signal length (in samples) and the embedding dimension \emph{m} minus 1 (with no intercept) performed significantly better (\(BF_{10} > 1000\)) than any other version, with an explained variance of 92.64\%. Based on this simple regression model, we can derive the following approximation (assuming a standardized signal with an SD of 1):
+Selecting the tolerance based on the signal's SD alone does not appear as a good default, given the strong impact of embedding dimension. In order to validate a new heuristic to approximate the optimal \emph{r} value based on the embedding dimension \emph{m} and the signal's length, we compared different regression specifications using the BIC-based Bayes Factor test. The model which included the log-transformed signal length (in samples) and the embedding dimension \emph{m} minus 1 (with no intercept) performed significantly better (\(BF_{10} > 1000\)) than any other model, with an explained variance of 92.64\%. Based on this simple regression model, we can derive the following approximation (assuming a standardized signal with an SD of 1):
 
 \begin{equation}
 \widehat{r} = 0.2811(m-1) + 0.0049(\log(n)) - 0.02(m-1 \times \log(n))
 \end{equation}
 
-It is to note that shorter signals require larger tolerance values, and the impact of length lowers as the signal gets longer. Also, for a dimension \emph{m} of 2 (and short signal lengths), this equation returns close results to the \emph{0.2 SD} heuristic, which is not entirely surprising as the latter was initially derived under such conditions (that are typical of some applications, such as heart-rate intervals).
+It should be noted that shorter signals require larger tolerance values, and the impact of length lowers as the signal gets longer. Also, for an embedding dimension of 2 (and short signal lengths), this equation returns values close to the \emph{0.2 SD} heuristic, which is not entirely surprising as the latter was initially derived under such conditions (and that are common in some applications, such as heart-rate intervals).
 
 \hypertarget{heuristics-comparison}{%
 \subsubsection{Heuristics Comparison}\label{heuristics-comparison}}
@@ -270,31 +270,31 @@ It is to note that shorter signals require larger tolerance values, and the impa
 \begin{longtable}[]{@{}lccc@{}}
 \caption{Comparison of Model Performance Indices}\tabularnewline
 \toprule()
-Model & BIC & R2 & BF \\
+Model & BIC & AIC & R2 \\
 \midrule()
 \endfirsthead
 \toprule()
-Model & BIC & R2 & BF \\
+Model & BIC & AIC & R2 \\
 \midrule()
 \endhead
-Makowski & -41375.73 & 0.77 & 1.00 \\
-Scholzel & -24637.03 & 0.68 & 0.00e+00 \\
-Chon & 24614.17 & 0.18 & 0.00e+00 \\
-SD & 35119.90 & 0.00 & 0.00e+00 \\
+Makowski & -41375.73 & -41402.30 & 0.77 \\
+Scholzel & -24637.03 & -24663.60 & 0.68 \\
+Chon & 24614.17 & 24587.60 & 0.18 \\
+SD & 35119.90 & 35102.18 & 0.00 \\
 \bottomrule()
 \end{longtable}
 
-We compared together different methods to approximate \(r_{maxApEn}\) (see \textbf{Table 1}) by comparing \(r_{maxApEn}\) (our ground-truth) to the value estimated by different methods. Our heuristic method presented in this study, based on the signal's SD, the embedding dimension and the log-transformed length, surpassed any other models (\(BF_{10} > 1000\), \(R^2\) = 0.77), and was followed by the \emph{Schötzel} adjustment (\(R^2\) = 0.68).
+We compared together different methods to approximate \(r_{maxApEn}\) (see \textbf{Table 1}) by comparing \(r_{maxApEn}\) (our ground-truth) to the values estimated by different methods. The new heuristic method introduced in this study, based on the signal's SD, the embedding dimension and the log-transformed length, surpassed all other models (\(BF_{10} > 1000\), \(R^2\) = 0.77).
 
 \hypertarget{discussion}{%
 \subsection{Discussion}\label{discussion}}
 
 The tolerance threshold \emph{r} is a key parameter of several entropy algorithms, including widely popular ones like \emph{SampEn}. The current gold standard method to estimate the optimal \emph{r} is to compute Approximate Entropy (\emph{ApEn}) over a range of different \emph{r} values and to select the one corresponding to the maximum \emph{ApEn} value. Unfortunately, this method is computationally costly.
 
-In this study, we have shown that a simple heuristic approximation based on the embedding dimension \emph{m} and the log-transformed signal length was a valid approximation of \(r_{maxApEn}\), showing superior performance to other heuristic methods.
-We suggest the use of this method as a default alternative to the \emph{0.2 SD} rule of thumb.
+In this study, we showed that a simple heuristic approximation based on the embedding dimension \emph{m} and the log-transformed signal length is a valid approximation of \(r_{maxApEn}\), showing superior performance to other heuristic methods.
+We recommend the use of this method as a default alternative to the \emph{0.2 SD} rule of thumb.
 
-While we believe that our data generation procedure was able to generate a wide variety of signals, and that our results are to some extent generalizable, future studies could attempt at refining the estimation procedures for specific signals (for instance, EEG, or heart rate data). All the methods of optimal tolerance \emph{r} estimation used in this study, including our new proposal, are available in the \emph{NeuroKit2} open-source Python software, \texttt{complexity\_tolerance()} function {[}9{]}.
+While we believe that our data generation procedure was able to generate a wide variety of signals, and that our results are to some extent generalizable, future studies could attempt at refining the estimation procedures for specific signals (for instance, EEG, or heart rate data). All the methods of optimal tolerance \emph{r} estimation used in this study, including our new proposal, are available in the \emph{NeuroKit2} open-source Python software, as an option in the \texttt{complexity\_tolerance()} function {[}9{]}.
 
 \newpage
 
